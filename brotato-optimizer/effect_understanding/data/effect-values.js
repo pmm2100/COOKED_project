@@ -3,6 +3,7 @@
 const perStat = (effect, stat, sourceStat, amount, divisor = 1, rounding = 'none') => ({
   effect, kind: 'perStat', stat, sourceStat, amount, divisor, rounding,
 });
+
 const perWeapon = (effect, stat, amount) => ({ effect, kind: 'perWeapon', stat, amount });
 
 export const EFFECT_VALUES = {

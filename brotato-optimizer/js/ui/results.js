@@ -16,14 +16,14 @@ export const renderMessage = (root, text) => root.replaceChildren(el('p', {}, te
 export function renderBuild(r, ctx, goal) {
   const b = r.build, ch = ctx.chars.get(b.characterId), { final: baseStats, breakdown } = computeStats(b, ctx, true), p = parts(b, ctx);
   const effects = analyzeBuildEffects(b, baseStats, ctx), final = effects.final;
-  const rows = ctx.stats.filter((s) => final[s.id]).map((s) => el('tr', { class: goal.stat === s.id ? 'goal' : '' },
-    el('th', { scope: 'row' }, s.name), el('td', { class: final[s.id] < 0 ? 'neg' : '' }, fmt(final[s.id]) + (s.unit === 'percent' ? '%' : ''))));
+  const rows = ctx.stats.filter((s) => final[s.id]).map((s) => el('tr', { class: goal.stat === s.id ? 'is-goal' : '' },
+    el('th', { scope: 'row' }, s.name), el('td', { class: final[s.id] < 0 ? 'negative' : '' }, fmt(final[s.id]) + (s.unit === 'percent' ? '%' : ''))));
   rows.push(el('tr', {}, el('th', { scope: 'row' }, 'Total DPS'), el('td', {}, fmt(totalDps(b, final, ctx)))));
   const notes = [...new Set([ch.note && `${ch.name}: ${ch.note}`,
     ...effects.unmodeled.map((x) => `${x.item}: ${x.effect}`),
     ...b.weapons.map((w) => ctx.weapons.get(w.id).note)].filter(Boolean))];
   const copy = (e) => navigator.clipboard?.writeText(buildText(b, ctx, r.score)).then(() => { e.target.textContent = 'Copied'; });
-  return el('article', { class: 'card' },
+  return el('article', { class: 'build-card' },
     el('h3', {}, ch.name),
     el('p', { class: 'score' }, `${goal.label}: ${fmt(r.score)}`, r.ok ? '' : ' (stat constraints not met)'),
     el('p', {}, el('strong', {}, 'Weapons: '), p.weapons.join(', ') || 'none'),

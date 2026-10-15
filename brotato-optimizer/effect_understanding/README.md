@@ -14,7 +14,7 @@ Moduł współpracuje z optymalizatorem w `brotato-optimizer/js` i korzysta z ob
 Uruchom z katalogu głównego repozytorium:
 
 ```sh
-node effect_understanding/analyze-build.mjs path/to/build.json
+node brotato-optimizer/effect_understanding/analyze-build.mjs path/to/build.json
 ```
 
 Format builda:
@@ -31,7 +31,7 @@ Format builda:
 }
 ```
 
-Bez ścieżki builda skrypt tworzy katalog efektów i podaje statystyki pokrycia modeli.
+Bez ścieżki builda skrypt tworzy katalog `brotato-optimizer/effect_understanding/data/effect-catalog.json` i podaje statystyki pokrycia modeli.
 
 ## Założenia
 
