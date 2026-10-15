@@ -20,24 +20,24 @@ async function fetchJson(url) {
 
 /** Load both source JSON files and add effect-modeled items to the optimizer's item registry. */
 export async function loadEffectData(ctx) {
-  const [base, dlc] = await Promise.all([
+  const [base, dlc, characterSource] = await Promise.all([
     fetchJson(new URL('../../../db_json/brotato_items.json', import.meta.url)),
     fetchJson(new URL('../../../db_json/brotato_items_dlc.json', import.meta.url)),
+    fetchJson(new URL('../../../db_json/brotato_weapons.json', import.meta.url)),
   ]);
-  const byName = new Map([...ctx.items.values()].map((item) => [normalize(item.name), item]));
   const statIds = new Set(ctx.stats.map((stat) => stat.id));
+  const toModifiers = (sourceStats) => Object.fromEntries(
+    Object.entries(sourceStats ?? [])
+      .map(([sourceId, value]) => [statAliases[sourceId] ?? sourceId, value])
+      .filter(([id, value]) => statIds.has(id) && Number.isFinite(value)),
+  );
+  const byName = new Map([...ctx.items.values()].map((item) => [normalize(item.name), item]));
 
   for (const [edition, source] of [['base', base], ['dlc', dlc]]) {
     for (const [name, record] of Object.entries(source)) {
-      if (!record.effect || !getEffectModel(name)) continue;
       const key = normalize(name);
       let item = byName.get(key);
       if (!item) {
-        const statModifiers = {};
-        for (const [sourceId, value] of Object.entries(record.stats ?? {})) {
-          const id = statAliases[sourceId] ?? sourceId;
-          if (statIds.has(id) && Number.isFinite(value)) statModifiers[id] = value;
-        }
         const id = key.replace(/ /g, '_');
         item = {
           id,
@@ -48,17 +48,44 @@ export async function loadEffectData(ctx) {
           maxStack: record.limit ?? null,
           unique: record.limit === 1,
           tags: [],
-          statModifiers,
-          effects: record.effect,
+          statModifiers: toModifiers(record.stats),
+          effects: record.effect ?? '',
         };
         ctx.items.set(id, item);
         byName.set(key, item);
       } else {
-        // Keep the optimizer's existing stat model, but use the complete source effect text for analysis/display.
-        item.effects = record.effect;
+        item.statModifiers = { ...toModifiers(record.stats), ...item.statModifiers };
+        item.rarity ??= record.tier;
+        item.price ??= record.price;
+        item.maxStack ??= record.limit;
+        item.effects = record.effect ?? item.effects;
         if (edition === 'dlc') item.dlc = 'abyssal_terrors';
       }
     }
+  }
+
+  const byCharacterName = new Map([...ctx.chars.values()].map((character) => [normalize(character.name), character]));
+  for (const [name, record] of Object.entries(characterSource)) {
+    const key = normalize(name);
+    const existing = byCharacterName.get(key);
+    const character = existing ?? {
+      id: key.replace(/ /g, '_'),
+      name,
+      dlc: record.dlc ? 'abyssal_terrors' : false,
+      statModifiers: {},
+      statMultipliers: {},
+      caps: {},
+      maxWeapons: 6,
+      minTier: 1,
+      weaponRestrictions: null,
+      startingWeapons: [],
+      note: '',
+    };
+    character.statModifiers = { ...toModifiers(record.stats), ...character.statModifiers };
+    character.dlc = record.dlc ? 'abyssal_terrors' : character.dlc;
+    character.startingWeapons = record.starting_weapons ?? character.startingWeapons;
+    character.note = record.effect ?? character.note;
+    if (!existing) ctx.chars.set(character.id, character);
   }
 
   return ctx;

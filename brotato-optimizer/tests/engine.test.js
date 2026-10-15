@@ -33,6 +33,8 @@ eq('Chained effects use recalculated stats', chainedEffects.final.engineering, 1
 eq('Base JSON effect item is available to optimizer', d.items.has('bloody_hand'), true);
 eq('DLC JSON effect item is available to optimizer', d.items.has('pearl'), true);
 eq('Effect descriptions are populated from source JSON', d.items.get('adrenaline')?.effects.includes('5 HP'), true);
+eq('All JSON item records are available to optimizer', d.items.size, 247);
+eq('JSON character records are available to optimizer', d.chars.size, 64);
 const tinyCtx = {
 	stats: d.stats,
 	chars: new Map([['well_rounded', d.chars.get('well_rounded')]]),

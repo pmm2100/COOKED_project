@@ -22,11 +22,15 @@ Chrome, a nie z tej aplikacji. Należy wyłączyć rozszerzenie lub powtórzyć 
 tego rozszerzenia. Błędy aplikacji będą wskazywać adres `http://.../brotato-optimizer/...`.
 
 ## Architektura
-- `js/data/*.js` – dane (moduły ES) + `index.js` (walidacja, błędny rekord jest pomijany i pokazany w banerze)
+- `js/data/*.js` – dane (moduły ES) + `index.js` (walidacja, błędny rekord jest pomijany i pokazany w banerze); rekordy przedmiotów i postaci z `db_json/` są ładowane automatycznie
 - `js/engine/` – czyste funkcje: `computeStats` (z rozbiciem źródeł), `weaponDps`, wzory, reguły buildu
 - `js/objectives/goals.js` – cele; `options.js` – opcje. **Nowy cel/opcja = jeden obiekt w rejestrze**, formularz i optymalizator zadziałają bez dalszych zmian
 - `js/optimizer/` – beam search (`search.js`), tryb A (`modeA.js`), tryb B (`modeB.js`)
 - `js/ui/` – formularz generowany z rejestru, karty wyników; wszystko przez `textContent`/`createElement`
+
+`db_json/brotato_weapons.json` zawiera rekordy postaci (64 wpisy), mimo nazwy pliku, a nie dane broni.
+Dlatego jest integrowany z rejestrem postaci. Dane dodatkowych broni wymagają osobnego źródła z tierami,
+obrażeniami, cooldownami i przelicznikami statystyk.
 
 ## Znane uproszczenia (TODO)
 - dane: tylko wycinek wiki (15 postaci, 11 broni wręcz, 26 przedmiotów); brak broni dystansowych, bonusów setów, wartości bazowych statystyk (`null` + `TODO verify`)
