@@ -1,19 +1,184 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Brotato Build Optimizer</title><link rel="stylesheet" href="css/style.css"></head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brotato Build Optimizer</title>
+  <meta name="description" content="Find the best Brotato builds for any character or goal.">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- No inline scripts (CSP: script-src 'self'). main.js builds the form from the registry. -->
+  <script type="module" src="js/main.js"></script>
+</head>
 <body>
-<header><h1>Brotato Build Optimizer</h1><p>Pick a character or a goal and get the strongest weapon and item combinations found by beam search.</p></header>
-<div id="banner" role="alert" hidden></div>
-<main>
-<form id="form" aria-label="Build settings">
-<div class="modes" role="group" aria-label="Mode"><button type="button" id="modeA">I have a character</button><button type="button" id="modeB">I have a goal</button></div>
-<label id="charRow">Character<input id="char" list="chars" autocomplete="off"><datalist id="chars"></datalist></label>
-<label>Goal<select id="goal"></select></label>
-<div id="options"></div>
-<div class="actions"><button type="submit" id="go">Generate</button><button type="button" id="cancel" hidden>Cancel</button><button type="button" id="reset">Reset</button></div>
-<progress id="bar" max="1" value="0" hidden></progress>
-</form>
-<section id="results" aria-live="polite"><p>Choose a goal and press Generate.</p></section>
-</main>
-<script type="module" src="js/main.js"></script>
-</body></html>
+  <a class="skip-link" href="#results">Skip to results</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div>
+        <h1>Brotato Build Optimizer</h1>
+        <p class="tagline">Pick a character or a goal. Get the weapons and items that push your stats furthest.</p>
+      </div>
+      <label class="dlc-toggle" for="opt-dlc">
+        <input type="checkbox" id="opt-dlc" data-option="includeDlc" checked>
+        <span class="switch" aria-hidden="true"></span>
+        <span class="dlc-text">Include Abyssal Terrors DLC</span>
+      </label>
+    </div>
+  </header>
+
+  <div id="data-banner" class="banner banner-warn" role="alert" hidden></div>
+
+  <main class="wrap layout">
+    <section class="panel" aria-labelledby="setup-title">
+      <h2 id="setup-title" class="visually-hidden">Build setup</h2>
+
+      <div class="mode-switch" role="radiogroup" aria-label="Mode">
+        <input type="radio" name="mode" id="mode-a" value="A" checked>
+        <label for="mode-a">
+          <strong>I have a character</strong>
+          <span>Show me the best builds for them</span>
+        </label>
+        <input type="radio" name="mode" id="mode-b" value="B">
+        <label for="mode-b">
+          <strong>I have a goal</strong>
+          <span>Show me the best characters for it</span>
+        </label>
+      </div>
+
+      <form id="build-form" novalidate>
+        <div class="field" id="field-character">
+          <label for="character-search">Character</label>
+          <input type="search" id="character-search" placeholder="Search characters" autocomplete="off" list="character-list">
+          <datalist id="character-list"></datalist>
+          <select id="character-select" aria-label="Character"></select>
+        </div>
+
+        <div class="field">
+          <label for="goal-select">Main goal</label>
+          <select id="goal-select"></select>
+          <p class="hint" id="goal-description"></p>
+        </div>
+
+        <div class="field" id="custom-weights" hidden>
+          <span class="label">Custom weights</span>
+          <div id="weights-root" class="weights"></div>
+        </div>
+
+        <fieldset class="presets">
+          <legend>Playstyle presets</legend>
+          <div class="chip-row">
+            <button type="button" class="chip" data-preset="safe">Safe</button>
+            <button type="button" class="chip" data-preset="aggressive">Aggressive</button>
+            <button type="button" class="chip" data-preset="economy">Economy</button>
+            <button type="button" class="chip" data-preset="speedrun">Speedrun</button>
+          </div>
+        </fieldset>
+
+        <div class="field">
+          <span class="label">Options</span>
+          <!-- Filled by js/ui/form.js: one <details class="opt-group"> per option group -->
+          <div id="options-root" class="options"></div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn btn-primary" id="btn-generate">Generate builds</button>
+          <button type="reset" class="btn btn-ghost" id="btn-reset">Reset</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="results-col" id="results" aria-labelledby="results-title" aria-live="polite" tabindex="-1">
+      <div class="results-head">
+        <h2 id="results-title">Results</h2>
+        <div class="results-tools">
+          <button type="button" class="btn btn-small" id="btn-copy" disabled>Copy build as text</button>
+          <button type="button" class="btn btn-small" id="btn-share" disabled>Share link</button>
+        </div>
+      </div>
+
+      <div id="state-idle" class="state">
+        <p class="state-title">Nothing generated yet</p>
+        <p>Choose a character and a goal, then select Generate builds.</p>
+      </div>
+
+      <div id="state-loading" class="state" hidden>
+        <p class="state-title" id="progress-label">Searching builds…</p>
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="progress-label">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <button type="button" class="btn btn-small" id="btn-cancel">Cancel</button>
+      </div>
+
+      <div id="state-empty" class="state" hidden>
+        <p class="state-title">No build matches your constraints</p>
+        <p>Relax a minimum stat, allow more item rarities, or raise the item limit.</p>
+      </div>
+
+      <div id="state-error" class="state state-error" hidden>
+        <p class="state-title">Something went wrong</p>
+        <p id="error-message"></p>
+      </div>
+
+      <div id="results-list" class="results-list"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Data comes from the community Brotato wiki. Effects that cannot be calculated are listed on each build and marked as not included in the score. Fan project, not affiliated with Blobfish.</p>
+    </div>
+  </footer>
+
+  <noscript><div class="banner banner-warn">This tool needs JavaScript. Serve the folder with <code>python -m http.server 8000</code> and open it in a modern browser.</div></noscript>
+
+  <!-- Templates: js/ui/results.js clones these and fills them with textContent. -->
+  <template id="tpl-build-card">
+    <article class="build-card">
+      <header class="build-head">
+        <div>
+          <h3 class="build-title"></h3>
+          <p class="build-sub"></p>
+        </div>
+        <p class="build-score"><span class="score-value"></span><span class="score-label">score</span></p>
+      </header>
+      <div class="build-body">
+        <section>
+          <h4>Weapons</h4>
+          <ul class="weapon-list"></ul>
+        </section>
+        <section>
+          <h4>Items</h4>
+          <ul class="item-list"></ul>
+        </section>
+        <section class="stats-section">
+          <h4>Final stats</h4>
+          <table class="stat-table">
+            <thead><tr><th scope="col">Stat</th><th scope="col">Value</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </section>
+      </div>
+      <details class="breakdown">
+        <summary>Where the numbers come from</summary>
+        <div class="breakdown-body"></div>
+      </details>
+      <details class="not-included" hidden>
+        <summary>Effects not included in the calculation</summary>
+        <ul></ul>
+      </details>
+    </article>
+  </template>
+
+  <template id="tpl-rank-row">
+    <article class="rank-row">
+      <button type="button" class="rank-toggle" aria-expanded="false">
+        <span class="rank-pos"></span>
+        <span class="rank-name"></span>
+        <span class="rank-mini"></span>
+        <span class="rank-score"></span>
+      </button>
+      <div class="rank-detail" hidden></div>
+    </article>
+  </template>
+</body>
+</html>
