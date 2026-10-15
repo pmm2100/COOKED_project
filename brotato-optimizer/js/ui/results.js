@@ -1,5 +1,6 @@
 import { el } from './components.js';
 import { computeStats, totalDps } from '../engine/stats.js';
+import { analyzeBuildEffects } from '../../../effect_understanding/evaluate.js';
 const ROMAN = ['I', 'II', 'III', 'IV'], fmt = (n) => String(Math.round(n * 10) / 10);
 
 const parts = (b, ctx) => ({
@@ -13,12 +14,13 @@ export function buildText(b, ctx, score) {
 export const renderMessage = (root, text) => root.replaceChildren(el('p', {}, text));
 
 export function renderBuild(r, ctx, goal) {
-  const b = r.build, ch = ctx.chars.get(b.characterId), { final, breakdown } = computeStats(b, ctx, true), p = parts(b, ctx);
+  const b = r.build, ch = ctx.chars.get(b.characterId), { final: baseStats, breakdown } = computeStats(b, ctx, true), p = parts(b, ctx);
+  const effects = analyzeBuildEffects(b, baseStats, ctx), final = effects.final;
   const rows = ctx.stats.filter((s) => final[s.id]).map((s) => el('tr', { class: goal.stat === s.id ? 'goal' : '' },
     el('th', { scope: 'row' }, s.name), el('td', { class: final[s.id] < 0 ? 'neg' : '' }, fmt(final[s.id]) + (s.unit === 'percent' ? '%' : ''))));
   rows.push(el('tr', {}, el('th', { scope: 'row' }, 'Total DPS'), el('td', {}, fmt(totalDps(b, final, ctx)))));
   const notes = [...new Set([ch.note && `${ch.name}: ${ch.note}`,
-    ...Object.keys(b.items).map((id) => { const i = ctx.items.get(id); return i.effects && `${i.name}: ${i.effects}`; }),
+    ...effects.unmodeled.map((x) => `${x.item}: ${x.effect}`),
     ...b.weapons.map((w) => ctx.weapons.get(w.id).note)].filter(Boolean))];
   const copy = (e) => navigator.clipboard?.writeText(buildText(b, ctx, r.score)).then(() => { e.target.textContent = 'Copied'; });
   return el('article', { class: 'card' },
@@ -27,7 +29,9 @@ export function renderBuild(r, ctx, goal) {
     el('p', {}, el('strong', {}, 'Weapons: '), p.weapons.join(', ') || 'none'),
     el('p', {}, el('strong', {}, 'Items: '), p.items.join(', ') || 'none'),
     el('table', {}, el('tbody', {}, rows)),
-    notes.length ? el('details', {}, el('summary', {}, 'Not included in calculation'), el('ul', {}, notes.map((n) => el('li', {}, n)))) : null,
+    effects.entries.length ? el('details', { open: true }, el('summary', {}, 'Numeric effects included in score'), el('ul', {}, effects.entries.map((x) =>
+      el('li', {}, `${x.item}: ${x.stat} ${x.value > 0 ? '+' : ''}${fmt(x.value)}${x.estimate ? ' (estimate)' : ''} (${x.effect})${x.assumption ? ` — ${x.assumption}` : ''}`)))) : null,
+    notes.length ? el('details', {}, el('summary', {}, 'Effects not included in calculation'), el('ul', {}, notes.map((n) => el('li', {}, n)))) : null,
     el('details', {}, el('summary', {}, 'Where the numbers come from'), el('ul', {}, Object.entries(breakdown).map(([id, src]) =>
       el('li', {}, `${ctx.stats.find((s) => s.id === id).name}: ${src.map((x) => `${x.source} ${x.value > 0 ? '+' : ''}${fmt(x.value)}`).join(', ')}`)))),
     el('button', { type: 'button', onclick: copy }, 'Copy build as text'));

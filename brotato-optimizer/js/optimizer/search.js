@@ -1,5 +1,6 @@
 import { computeStats } from '../engine/stats.js';
 import { canAddItem, canAddWeapon } from '../engine/validate.js';
+import { analyzeBuildEffects } from '../../../effect_understanding/evaluate.js';
 
 /**
  * Beam search over "add one weapon / add one item" steps; stops when no step improves the best score.
@@ -17,8 +18,9 @@ export function search(chId, goal, cfg, ctx, deadline = Infinity) {
   }
   const viol = (f) => Object.entries(cfg.minStats).reduce((a, [k, m]) => a + Math.max(0, m - f[k]), 0);
   const evalState = (st) => {
-    const b = { characterId: chId, ...st }, { final } = computeStats(b, ctx), v = viol(final);
-    return { ...st, score: goal.score(final, b, ctx) - (v ? 1e6 + v * 1e3 : 0), ok: !v };
+    const b = { characterId: chId, ...st }, { final: baseStats } = computeStats(b, ctx);
+    const effects = analyzeBuildEffects(b, baseStats, ctx), final = effects.final, v = viol(final);
+    return { ...st, effects, score: goal.score(final, b, ctx) - (v ? 1e6 + v * 1e3 : 0), ok: !v };
   };
   const key = (st) => st.weapons.map((x) => x.id + x.tier).sort().join() + '|' + Object.entries(st.items).sort().join();
   let beam = [evalState({ weapons: [], items: {}, nItems: 0, price: 0 })], best = beam[0].score;
@@ -32,5 +34,5 @@ export function search(chId, goal, cfg, ctx, deadline = Infinity) {
     if (!sorted.length || sorted[0].score <= best) break;
     beam = sorted; best = sorted[0].score;
   }
-  return beam.slice(0, cfg.results).map((s) => ({ build: { characterId: chId, weapons: s.weapons, items: s.items }, score: s.score, ok: s.ok }));
+  return beam.slice(0, cfg.results).map((s) => ({ build: { characterId: chId, weapons: s.weapons, items: s.items }, score: s.score, ok: s.ok, effects: s.effects }));
 }

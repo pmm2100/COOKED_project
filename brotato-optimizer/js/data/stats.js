@@ -5,6 +5,6 @@ export default [
   S('armor', 'Armor', 'defense'), S('dodge', 'Dodge', 'defense', 'percent'),
   S('damage_pct', '% Damage', 'offense', 'percent'), S('melee', 'Melee Damage', 'offense'), S('ranged', 'Ranged Damage', 'offense'),
   S('elemental', 'Elemental Damage', 'offense'), S('attack_speed', 'Attack Speed', 'offense', 'percent'), S('crit', 'Crit Chance', 'offense', 'percent'),
-  S('range', 'Range', 'offense'), S('engineering', 'Engineering', 'utility'), S('speed', 'Speed', 'utility', 'percent'),
+  S('range', 'Range', 'offense'), S('knockback', 'Knockback', 'offense'), S('engineering', 'Engineering', 'utility'), S('speed', 'Speed', 'utility', 'percent'),
   S('luck', 'Luck', 'utility'), S('harvesting', 'Harvesting', 'utility'), S('curse', 'Curse', 'utility'),
 ];

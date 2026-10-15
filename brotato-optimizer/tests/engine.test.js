@@ -1,5 +1,6 @@
 import { loadData } from '../js/data/index.js';
 import { computeStats, weaponDps } from '../js/engine/stats.js';
+import { analyzeBuildEffects } from '../../effect_understanding/evaluate.js';
 const d = loadData(), out = [];
 const eq = (name, got, want, tol = 0) => out.push(`${Math.abs(got - want) <= tol ? 'PASS' : 'FAIL'} ${name}: got ${got}, expected ${want}`);
 const { final } = computeStats({ characterId: 'well_rounded', weapons: [], items: { alien_worm: 2 } }, d);
@@ -7,5 +8,16 @@ eq('Max HP = 5 + 2x3', final.max_hp, 11); eq('HP regen = 2x2', final.hp_regen, 4
 eq('Fist tier I DPS (wiki: 10.3)', weaponDps(d.weapons.get('fist'), 1, final), 10.3, 0.1);
 const g = computeStats({ characterId: 'chunky', weapons: [], items: { alien_worm: 2 } }, d).final;
 eq('Chunky: Max HP x1.25 on items', g.max_hp, 7.5); eq('Chunky: HP regen x0.5 on items', g.hp_regen, 2);
+const adrenaline = analyzeBuildEffects({ characterId: 'well_rounded', weapons: [], items: { adrenaline: 1 } }, { ...final, dodge: 50, hp_regen: 0 }, d);
+eq('Adrenaline expected healing estimate', adrenaline.final.hp_regen, 0.3125, 0.0001);
+const ghostOutfit = analyzeBuildEffects({ characterId: 'well_rounded', weapons: [], items: { ghost_outfit: 1 } }, { ...final, dodge: 80 }, d);
+eq('Ghost Outfit effect caps Dodge at 70', ghostOutfit.final.dodge, 70);
+const effectItems = new Map(d.items);
+effectItems.set('snowball', { id: 'snowball', name: 'Snowball', statModifiers: {}, effects: '' });
+effectItems.set('strange_book', { id: 'strange_book', name: 'Strange Book', statModifiers: {}, effects: '' });
+effectItems.set('elemental_item', { id: 'elemental_item', name: 'Elemental Item', statModifiers: { elemental: 1 }, effects: '' });
+const chainedEffects = analyzeBuildEffects({ characterId: 'well_rounded', weapons: [], items: { snowball: 1, strange_book: 1, elemental_item: 1 } },
+	{ ...final, elemental: 0, engineering: 0 }, { ...d, items: effectItems });
+eq('Chained effects use recalculated stats', chainedEffects.final.engineering, 1);
 if (typeof document !== 'undefined') document.getElementById('out').textContent = out.join('\n') + (d.warnings.length ? '\nWARN ' + d.warnings : '');
 else console.log(out.join('\n'));
