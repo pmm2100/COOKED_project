@@ -1,8 +1,9 @@
-// Source: /Characters. statMultipliers = "X modifications are increased/reduced" (applied to item modifiers only).
-// Conditional / per-stat scaling effects are kept as text in `note` (not included in calculation).
+// Source: /Characters. Conditional effects stay as text; modeled stat changes are in statModifiers.
 const C = (id, name, statModifiers, o = {}) => ({
   id, name, dlc: o.dlc ? 'abyssal_terrors' : false, statModifiers, statMultipliers: o.mult ?? {}, caps: o.caps ?? {},
-  maxWeapons: o.maxWeapons ?? 6, minTier: o.minTier ?? 1, weaponRestrictions: null, startingWeapons: o.start ?? [], note: o.note ?? '',
+  maxWeapons: o.maxWeapons ?? 6, minTier: o.minTier ?? 1, weaponRestrictions: null,
+  startingWeapons: o.start ?? [], startingItems: [], itemTags: [], unlockedBy: null, unlocks: null,
+  sourceStats: {}, note: o.note ?? '',
 });
 export default [
   C('well_rounded', 'Well Rounded', { max_hp: 5, speed: 5, harvesting: 8 }),

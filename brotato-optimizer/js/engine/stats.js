@@ -17,7 +17,7 @@ export function computeStats(build, ctx, withBreakdown = false) {
     if (cap != null) final[s.id] = Math.min(final[s.id], cap);
     if (s.min != null) final[s.id] = Math.max(final[s.id], s.min);
   }
-  return { final, breakdown };
+  return { final, breakdown, characterStats: { ...ch.statModifiers } };
 }
 
 /** DPS = damage(base + Σ scaling × stat) × crit factor / (cooldown / attack speed). Special effects excluded. TODO verify attack speed formula. */

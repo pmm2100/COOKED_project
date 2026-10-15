@@ -28,8 +28,8 @@ tego rozszerzenia. Błędy aplikacji będą wskazywać adres `http://.../brotato
 - `js/optimizer/` – beam search (`search.js`), tryb A (`modeA.js`), tryb B (`modeB.js`)
 - `js/ui/` – formularz generowany z rejestru, karty wyników; wszystko przez `textContent`/`createElement`
 
-`db_json/brotato_weapons.json` zawiera rekordy postaci (64 wpisy), mimo nazwy pliku, a nie dane broni.
-Dlatego jest integrowany z rejestrem postaci. Dane dodatkowych broni wymagają osobnego źródła z tierami,
+`db_json/brotato_characters.json` zawiera pełne rekordy 64 postaci z wiki: statystyki oryginalne,
+warunki odblokowania, nagrody, wyposażenie startowe, tagi i efekty. Dane dodatkowych broni wymagają osobnego źródła z tierami,
 obrażeniami, cooldownami i przelicznikami statystyk.
 
 ## Znane uproszczenia (TODO)

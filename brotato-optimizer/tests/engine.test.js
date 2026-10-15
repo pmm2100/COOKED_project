@@ -8,8 +8,11 @@ import GOALS from '../js/objectives/goals.js';
 import { loadEffectData } from '../js/data/effects.js';
 const d = await loadEffectData(loadData()), out = [];
 const eq = (name, got, want, tol = 0) => out.push(`${Math.abs(got - want) <= tol ? 'PASS' : 'FAIL'} ${name}: got ${got}, expected ${want}`);
+const same = (name, got, want) => out.push(`${got === want ? 'PASS' : 'FAIL'} ${name}: got ${got}, expected ${want}`);
 const { final } = computeStats({ characterId: 'well_rounded', weapons: [], items: { alien_worm: 2 } }, d);
 eq('Max HP = 5 + 2x3', final.max_hp, 11); eq('HP regen = 2x2', final.hp_regen, 4); eq('Speed', final.speed, 5);
+eq('Character Max HP is included without items', computeStats({ characterId: 'well_rounded', weapons: [], items: {} }, d).final.max_hp, 5);
+eq('Character Max HP is included before item stats', final.max_hp - 2 * d.items.get('alien_worm').statModifiers.max_hp, 5);
 eq('Fist tier I DPS (wiki: 10.3)', weaponDps(d.weapons.get('fist'), 1, final), 10.3, 0.1);
 const g = computeStats({ characterId: 'chunky', weapons: [], items: { alien_worm: 2 } }, d).final;
 eq('Chunky: Max HP x1.25 on items', g.max_hp, 7.5); eq('Chunky: HP regen x0.5 on items', g.hp_regen, 2);
@@ -35,6 +38,12 @@ eq('DLC JSON effect item is available to optimizer', d.items.has('pearl'), true)
 eq('Effect descriptions are populated from source JSON', d.items.get('adrenaline')?.effects.includes('5 HP'), true);
 eq('All JSON item records are available to optimizer', d.items.size, 247);
 eq('JSON character records are available to optimizer', d.chars.size, 64);
+same('Character unlock metadata is loaded', d.chars.get('generalist')?.unlocks, 'Big Arms');
+eq('Character starting items are loaded', d.chars.get('mage')?.startingItems.includes('Snake'), true);
+eq('Character tags are loaded', d.chars.get('generalist')?.itemTags.includes('Melee Damage'), true);
+eq('Original Brawler ranged penalty is applied', d.chars.get('brawler')?.statModifiers.ranged, -50);
+eq('Original Chunky consumable stat is applied', d.chars.get('chunky')?.statModifiers.hp_recovered_from_consumables, 3);
+eq('Original Ranger range stat is applied', d.chars.get('ranger')?.statModifiers.range, 50);
 const tinyCtx = {
 	stats: d.stats,
 	chars: new Map([['well_rounded', d.chars.get('well_rounded')]]),

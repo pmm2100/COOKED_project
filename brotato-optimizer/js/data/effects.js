@@ -23,7 +23,7 @@ export async function loadEffectData(ctx) {
   const [base, dlc, characterSource] = await Promise.all([
     fetchJson(new URL('../../../db_json/brotato_items.json', import.meta.url)),
     fetchJson(new URL('../../../db_json/brotato_items_dlc.json', import.meta.url)),
-    fetchJson(new URL('../../../db_json/brotato_weapons.json', import.meta.url)),
+    fetchJson(new URL('../../../db_json/brotato_characters.json', import.meta.url)),
   ]);
   const statIds = new Set(ctx.stats.map((stat) => stat.id));
   const toModifiers = (sourceStats) => Object.fromEntries(
@@ -54,7 +54,7 @@ export async function loadEffectData(ctx) {
         ctx.items.set(id, item);
         byName.set(key, item);
       } else {
-        item.statModifiers = { ...toModifiers(record.stats), ...item.statModifiers };
+        item.statModifiers = { ...item.statModifiers, ...toModifiers(record.stats) };
         item.rarity ??= record.tier;
         item.price ??= record.price;
         item.maxStack ??= record.limit;
@@ -79,11 +79,21 @@ export async function loadEffectData(ctx) {
       minTier: 1,
       weaponRestrictions: null,
       startingWeapons: [],
+      startingItems: [],
+      itemTags: [],
+      unlockedBy: null,
+      unlocks: null,
+      sourceStats: {},
       note: '',
     };
-    character.statModifiers = { ...toModifiers(record.stats), ...character.statModifiers };
+    character.statModifiers = { ...character.statModifiers, ...toModifiers(record.stats) };
+    character.sourceStats = { ...(record.stats ?? {}) };
     character.dlc = record.dlc ? 'abyssal_terrors' : character.dlc;
     character.startingWeapons = record.starting_weapons ?? character.startingWeapons;
+    character.startingItems = record.starting_items ?? character.startingItems;
+    character.itemTags = record.item_tags ?? character.itemTags;
+    character.unlockedBy = record.unlocked_by ?? character.unlockedBy;
+    character.unlocks = record.unlocks ?? character.unlocks;
     character.note = record.effect ?? character.note;
     if (!existing) ctx.chars.set(character.id, character);
   }
