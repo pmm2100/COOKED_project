@@ -8,6 +8,7 @@ const OPTIONS = [
   { id: 'rarities', label: 'Allowed item tiers', group: 'Content', type: 'multiselect', default: ['1', '2', '3', '4'],
     choices: () => ROMAN.map((r, i) => ({ value: String(i + 1), label: `Tier ${r}` })), apply: (c, v) => { c.rarities = v; } },
   num('maxWeapons', 'Max weapons', 'Build size', 6, 0, 6, (c, v) => { c.maxWeapons = v; }),
+  num('minItems', 'Min items', 'Build size', 0, 0, 60, (c, v) => { c.minItems = v; }),
   num('maxItems', 'Max items', 'Build size', 30, 0, 60, (c, v) => { c.maxItems = v; }),
   num('tier', 'Highest weapon tier', 'Weapons', 4, 1, 4, (c, v) => { c.preferredTier = v; }),
   tog('allowDup', 'Allow duplicate weapons', 'Weapons', true, (c, v) => { c.allowDup = v; }),
@@ -27,8 +28,9 @@ const OPTIONS = [
 export default OPTIONS;
 
 export function buildConfig(values) {
-  const c = { dlc: true, rarities: [], banned: [], noDownsides: false, maxCopies: 99, maxWeapons: 6, maxItems: 30,
+  const c = { dlc: true, rarities: [], banned: [], noDownsides: false, maxCopies: 99, maxWeapons: 6, minItems: 0, maxItems: 30,
     preferredTier: 4, allowDup: true, maxPrice: Infinity, minStats: {}, results: 3, beam: 12 };
   for (const o of OPTIONS) o.apply(c, values[o.id]);
+  c.maxItems = Math.max(c.minItems, c.maxItems);
   return c;
 }

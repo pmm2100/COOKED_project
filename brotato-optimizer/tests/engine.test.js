@@ -58,6 +58,15 @@ const tinyConfig = {
 const effectSearch = search('well_rounded', { score: (stats) => stats.hp_regen }, tinyConfig, tinyCtx);
 eq('Search scoring includes modeled item effects', effectSearch[0]?.score, 0.03125, 0.0001);
 eq('Search selects effect item', effectSearch[0]?.build.items.adrenaline, 1);
+const budgetSearch = search('well_rounded', { score: (stats) => stats.max_hp }, {
+  ...tinyConfig, rarities: ['1'], maxCopies: 99, minItems: 2, maxItems: 5, maxPrice: 30,
+}, { ...tinyCtx, items: new Map([['cheap', { id: 'cheap', name: 'Cheap', rarity: 1, price: 10, statModifiers: { max_hp: 1 }, effects: '' }]]) });
+same('Search respects minimum item count', (budgetSearch[0]?.build.items.cheap ?? 0) >= 2, true);
+eq('Search limits items by budget', Object.values(budgetSearch[0]?.build.items ?? {}).reduce((sum, count) => sum + count, 0), 3);
+const deepSearch = search('well_rounded', { score: (stats) => stats.max_hp }, {
+  ...tinyConfig, rarities: ['3'], maxCopies: 99, minItems: 0, maxItems: 30, maxPrice: 3000,
+}, { ...tinyCtx, items: new Map([['alien_baby', { id: 'alien_baby', name: 'Alien Baby', rarity: 3, price: 80, statModifiers: { max_hp: 15 }, effects: '' }]]) });
+eq('Search explores beyond the first two items', deepSearch[0]?.build.items.alien_baby, 3);
 if (typeof document !== 'undefined') {
 	const card = renderBuild({ build: { characterId: 'well_rounded', weapons: [], items: {} }, score: 5, ok: true }, d, GOALS[0]);
 	eq('Build result uses styled card class', card.classList.contains('build-card'), true);
