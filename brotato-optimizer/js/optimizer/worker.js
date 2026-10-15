@@ -27,10 +27,10 @@ self.addEventListener('message', async ({ data }) => {
 
   try {
     const rows = data.mode === 'A'
-      ? search(data.characterId, goal, data.config, ctx, Date.now() + 10000,
+      ? search(data.characterId, goal, data.config, ctx, Date.now() + 60000,
         (progress) => self.postMessage({ type: 'progress', progress }))
       : await runModeB(goal, data.config, ctx, {
-        limitMs: 10000,
+        limitMs: 60000,
         onProgress: (progress) => self.postMessage({ type: 'progress', progress }),
       });
     self.postMessage({ type: 'progress', progress: 1 });

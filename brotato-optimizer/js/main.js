@@ -58,7 +58,7 @@ function runOptimization(mode, goalId, characterId, config, onProgress) {
     activeWorker = worker;
     const timeout = setTimeout(() => finish(reject, new Error(
       'Optimizer did not respond in time. Check that the app is served over HTTP and reload the page.'
-    )), 30000);
+    )), 120000);
     const finish = (handler, value) => {
       clearTimeout(timeout);
       worker.terminate();

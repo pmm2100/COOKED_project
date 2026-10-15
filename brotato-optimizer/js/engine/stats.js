@@ -4,7 +4,8 @@ export const effectiveHp = (s) => Math.max(1, s.max_hp) / dmgTaken(s.armor) / (1
 
 const WEAPON_CLASS_BONUSES = {
   Blade: [{ melee: 1, life_steal: 1 }, { melee: 2, life_steal: 2 }, { melee: 3, life_steal: 3 }, { melee: 4, life_steal: 4 }, { melee: 5, life_steal: 5 }],
-  Blunt: [{ armor: 1, speed: -2 }, { armor: 1, max_hp: 3, speed: -4 }, { armor: 2, max_hp: 3, speed: -6 }, { armor: 2, max_hp: 6, speed: -8 }, { armor: 3, max_hp: 6, speed: -10 }],
+  Blunt: [{ armor: 1, speed: -2 }, { armor: 1, max_hp: 3, speed: -4 }, { armor: 2, max_hp: 3, speed: -6 },
+  { armor: 2, max_hp: 6, speed: -8 }, { armor: 3, max_hp: 6, speed: -10 }],
   Elemental: [{ elemental: 1 }, { elemental: 2 }, { elemental: 3 }, { elemental: 4 }, { elemental: 5 }],
   Ethereal: [{ dodge: 6, armor: -1 }, { dodge: 12, armor: -2 }, { dodge: 18, armor: -3 }, { dodge: 24, armor: -4 }, { dodge: 30, armor: -5 }],
   Explosive: [{ explosive_size: 5 }, { explosive_size: 10 }, { explosive_size: 15 }, { explosive_size: 20 }, { explosive_size: 25 }],

@@ -5,6 +5,7 @@ const T = (d, cd, cc, cm, s) => d.map((x, i) => x == null ? null : {
   baseDamage: x, cooldown: cd[i], critChance: p(cc, i), critMultiplier: p(cm, i),
   scaling: Object.fromEntries(Object.entries(s).map(([k, v]) => [k, p(v, i)])),
 });
+
 const W = (id, name, classes, price, tiers, o = {}) => ({ id, name, dlc: o.dlc ? 'abyssal_terrors' : false, type: 'melee', classes, price, tiers, note: o.note ?? '' });
 export default [
   W('fist', 'Fist', ['Unarmed'], [10, 22, 45, 91], T([8, 16, 32, 64], [.78, .73, .69, .59], .01, 1.5, { melee: 1 })),

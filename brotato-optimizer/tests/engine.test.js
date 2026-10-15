@@ -2,7 +2,7 @@ import { loadData } from '../js/data/index.js';
 import { computeStats, weaponDps } from '../js/engine/stats.js';
 import { analyzeBuildEffects } from '../effect_understanding/evaluate.js';
 import { search } from '../js/optimizer/search.js';
-import { canAddItem } from '../js/engine/validate.js';
+import { canAddItem, canAddWeapon } from '../js/engine/validate.js';
 import { renderBuild, renderResults } from '../js/ui/results.js';
 import GOALS from '../js/objectives/goals.js';
 import { loadEffectData } from '../js/data/effects.js';
@@ -37,6 +37,12 @@ for (const [rarity, limit] of [[1, 8], [2, 5], [3, 3], [4, 1]]) {
 	eq(`Tier ${rarity} allows ${limit} copies`, canAddItem({ nItems: limit - 1, items: { [item.id]: limit - 1 }, price: 0 }, item, copyConfig), true);
 	eq(`Tier ${rarity} blocks copy ${limit + 1}`, canAddItem({ nItems: limit, items: { [item.id]: limit }, price: 0 }, item, copyConfig), false);
 }
+same('Duplicate weapons are blocked by default', canAddWeapon({ weapons: [{ id: 'test', tier: 1 }], price: 0 },
+	{ id: 'test', price: [10], tiers: [{}] }, 1, { allowDup: false, maxPrice: Infinity }), false);
+same('Missing weapon prices are not treated as free', canAddWeapon({ weapons: [], price: [0] },
+	{ id: 'test', price: [null], tiers: [{}] }, 1, { allowDup: true, maxPrice: Infinity }), false);
+same('Missing item prices are not treated as free', canAddItem({ nItems: 0, items: {}, price: 0 },
+	{ id: 'test', rarity: 1, price: null }, { maxCopies: 99, maxItems: 1, maxPrice: Infinity }), false);
 const effectItems = new Map(d.items);
 effectItems.set('snowball', { id: 'snowball', name: 'Snowball', statModifiers: {}, effects: '' });
 effectItems.set('strange_book', { id: 'strange_book', name: 'Strange Book', statModifiers: {}, effects: '' });
@@ -88,10 +94,40 @@ const tierSearch = search('well_rounded', { score: (stats) => stats.max_hp }, {
 	...tinyConfig, rarities: [], maxItems: 0, maxWeapons: 1, preferredTier: 2, maxPrice: Infinity, allowDup: false, beam: 100, results: 1,
 }, d);
 same('Weapon search keeps tiers at or below selected tier', tierSearch[0]?.build.weapons[0]?.tier <= 2, true);
+const budgetWeaponSearch = search('well_rounded', { score: (stats) => stats.max_hp }, {
+	...tinyConfig, rarities: [], maxItems: 0, maxWeapons: 1, maxPrice: 20, beam: 100, results: 1,
+}, d);
+same('Weapon budget excludes unaffordable tier', budgetWeaponSearch[0]?.build.weapons[0]?.tier, 1);
 const multiWeaponSearch = search('well_rounded', { score: (stats) => stats.life_steal }, {
 	...tinyConfig, rarities: [], maxItems: 0, maxWeapons: 4, beam: 100, results: 1,
 }, d);
 eq('Search fills available weapon slots for a weapon-focused build', multiWeaponSearch[0]?.build.weapons.length, 4);
+const fullWeaponSearch = search('well_rounded', { score: (stats) => stats.max_hp }, {
+	...tinyConfig, rarities: ['1'], maxItems: 30, maxWeapons: 6, beam: 12, results: 1,
+}, d);
+eq('Search preserves six-weapon paths with item search enabled', fullWeaponSearch[0]?.build.weapons.length, 6);
+same('Characters that cannot equip weapons return no required-weapon build', search('bull', { score: (stats) => stats.max_hp }, {
+	...tinyConfig, rarities: [], maxItems: 0, maxWeapons: 6, results: 1, requireWeapon: true,
+}, d).length, 0);
+const harvestingCtx = {
+	...tinyCtx,
+	items: new Map([['harvesting_item', { id: 'harvesting_item', name: 'Harvesting Item', rarity: 1, price: 10, statModifiers: { harvesting: 25 }, effects: '' }]]),
+	weapons: new Map([['test_weapon', { id: 'test_weapon', name: 'Test Weapon', price: [10, 20, 40, 80],
+		tiers: [{ baseDamage: 1, cooldown: 1, scaling: {} }, { baseDamage: 2, cooldown: 1, scaling: {} },
+			{ baseDamage: 3, cooldown: 1, scaling: {} }, { baseDamage: 4, cooldown: 1, scaling: {} }], classes: [] }]]),
+};
+const harvestingSearch = search('well_rounded', { score: (stats) => stats.harvesting }, {
+	...tinyConfig, rarities: ['1'], maxItems: 1, maxWeapons: 1, beam: 20, results: 1,
+}, harvestingCtx);
+same('Harvesting search keeps the best harvesting item', harvestingSearch[0]?.build.items.harvesting_item, 1);
+const unrestrictedTierSearch = search('well_rounded', { score: () => 0 }, {
+	...tinyConfig, rarities: [], maxItems: 0, maxWeapons: 1, beam: 20, results: 1,
+}, harvestingCtx);
+same('Unrestricted weapon search prefers tier IV', unrestrictedTierSearch[0]?.build.weapons[0]?.tier, 4);
+const harvestingWeaponSearch = search('well_rounded', GOALS.find((goal) => goal.id === 'stat_harvesting'), {
+	...tinyConfig, rarities: [], maxItems: 0, maxWeapons: 1, beam: 100, results: 1,
+}, d);
+same('Harvesting search prefers Support weapons over Excalibur', d.weapons.get(harvestingWeaponSearch[0]?.build.weapons[0]?.id)?.classes.includes('Support'), true);
 if (typeof document !== 'undefined') {
 	const card = renderBuild({ build: { characterId: 'well_rounded', weapons: [], items: {} }, score: 5, ok: true }, d, GOALS[0]);
 	eq('Build result uses styled card class', card.classList.contains('build-card'), true);

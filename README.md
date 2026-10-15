@@ -22,17 +22,17 @@ Chrome, a nie z tej aplikacji. Należy wyłączyć rozszerzenie lub powtórzyć 
 tego rozszerzenia. Błędy aplikacji będą wskazywać adres `http://.../brotato-optimizer/...`.
 
 ## Architektura
-- `js/data/*.js` – dane (moduły ES) + `index.js` (walidacja, błędny rekord jest pomijany i pokazany w banerze); rekordy przedmiotów i postaci z `db_json/` są ładowane automatycznie
+- `js/data/*.js` – dane (moduły ES) + `index.js` (walidacja, błędny rekord jest pomijany i pokazany w banerze); rekordy przedmiotów, postaci i broni z `brotato-optimizer/db_json/` są ładowane automatycznie
 - `js/engine/` – czyste funkcje: `computeStats` (z rozbiciem źródeł), `weaponDps`, wzory, reguły buildu
 - `js/objectives/goals.js` – cele; `options.js` – opcje. **Nowy cel/opcja = jeden obiekt w rejestrze**, formularz i optymalizator zadziałają bez dalszych zmian
 - `js/optimizer/` – beam search (`search.js`), tryb A (`modeA.js`), tryb B (`modeB.js`)
 - `js/ui/` – formularz generowany z rejestru, karty wyników; wszystko przez `textContent`/`createElement`
 
-`db_json/brotato_characters.json` zawiera pełne rekordy 64 postaci z wiki: statystyki oryginalne,
+`brotato-optimizer/db_json/brotato_characters.json` zawiera pełne rekordy 64 postaci z wiki: statystyki oryginalne,
 warunki odblokowania, nagrody, wyposażenie startowe, tagi i efekty. Dane dodatkowych broni wymagają osobnego źródła z tierami,
 obrażeniami, cooldownami i przelicznikami statystyk.
 
-`db_json/brotato_weapons.json` zawiera dane broni z tabel Weapons wiki (melee i ranged), w tym
+`brotato-optimizer/db_json/brotato_weapons.json` zawiera dane broni z tabel Weapons wiki (melee i ranged), w tym
 tiery, obrażenia, cooldown, ceny, klasy i podstawowe skalowanie. Loader dodaje je do rejestru
 wyszukiwarki przy starcie aplikacji. Wyszukiwanie uwzględnia bonusy klas broni od 2 do 6
 wyposażonych broni, preferuje wypełnienie ustawionego limitu `Max weapons` i filtruje bronie

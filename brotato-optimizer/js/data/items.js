@@ -3,6 +3,7 @@ const I = (id, name, rarity, price, statModifiers, o = {}) => ({
   id, name, dlc: o.dlc ? 'abyssal_terrors' : false, rarity, price, statModifiers,
   maxStack: o.limit ?? null, unique: o.limit === 1, tags: [], effects: o.note ?? '',
 });
+
 export default [
   I('acid', 'Acid', 2, 65, { max_hp: 8, dodge: -2 }),
   I('adrenaline', 'Adrenaline', 3, 60, { dodge: 5 }, { limit: 1, note: '50% chance to heal 5 HP when dodging' }),

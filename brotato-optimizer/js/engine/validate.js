@@ -7,7 +7,11 @@ const maxCopiesFor = (it, cfg) => Math.min(
   cfg.maxCopies,
 );
 
-export const canAddItem = (st, it, cfg) => st.nItems < cfg.maxItems &&
+export const canAddItem = (st, it, cfg) => Number.isFinite(it.price) && st.nItems < cfg.maxItems &&
   (st.items[it.id] ?? 0) < maxCopiesFor(it, cfg) && st.price + it.price <= cfg.maxPrice;
-export const canAddWeapon = (st, w, tier, cfg) => (cfg.allowDup || !st.weapons.some((x) => x.id === w.id)) &&
-  st.price + w.price[tier - 1] <= cfg.maxPrice;
+export const canAddWeapon = (st, w, tier, cfg) => {
+  const price = w.price?.[tier - 1];
+  return Number.isFinite(price) &&
+    (cfg.allowDup || !st.weapons.some((x) => x.id === w.id)) &&
+    st.price + price <= cfg.maxPrice;
+};

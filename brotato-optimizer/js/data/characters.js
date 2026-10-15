@@ -5,6 +5,7 @@ const C = (id, name, statModifiers, o = {}) => ({
   startingWeapons: o.start ?? [], startingItems: [], itemTags: [], unlockedBy: null, unlocks: null,
   sourceStats: {}, note: o.note ?? '',
 });
+
 export default [
   C('well_rounded', 'Well Rounded', { max_hp: 5, speed: 5, harvesting: 8 }),
   C('brawler', 'Brawler', { dodge: 15, range: -50, ranged: -50 }, { start: ['fist'], note: '+50% Attack Speed with Unarmed weapons' }),

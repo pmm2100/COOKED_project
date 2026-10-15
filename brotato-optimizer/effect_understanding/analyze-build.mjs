@@ -8,7 +8,7 @@ import { analyzeBuildEffects, getEffectModel } from './evaluate.js';
 import { EFFECT_ASSUMPTIONS } from './data/effect-values.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const workspaceRoot = resolve(here, '../..');
+const workspaceRoot = resolve(here, '..');
 const normalize = (value) => String(value ?? '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
   .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const parse = async (path) => JSON.parse(await readFile(path, 'utf8'));
@@ -42,6 +42,7 @@ const catalog = {
     model: getEffectModel(name) ?? null,
   })),
 };
+
 await writeFile(resolve(here, 'data/effect-catalog.json'), `${JSON.stringify(catalog, null, 2)}\n`, 'utf8');
 
 const ctx = loadData();
@@ -52,6 +53,7 @@ const statAliases = {
 };
 
 const itemByName = new Map();
+
 for (const item of sourceItems) {
   const id = normalize(item.name).replace(/ /g, '_');
   let appItem = ctx.items.get(id);
@@ -71,6 +73,7 @@ for (const item of sourceItems) {
     };
     ctx.items.set(id, appItem);
   }
+
   itemByName.set(normalize(item.name), appItem);
 }
 
@@ -90,7 +93,7 @@ if (!buildPath) {
   for (const [inputId, count] of Object.entries(input.items ?? {})) {
     const item = ctx.items.get(inputId) ?? itemByName.get(normalize(inputId.replace(/_/g, ' ')));
 
-    if (!item) 
+    if (!item)
       throw new Error(`Unknown item in build: ${inputId}`);
     const id = item.id ?? normalize(item.name).replace(/ /g, '_');
     if (!ctx.items.has(id)) ctx.items.set(id, item);
@@ -101,6 +104,7 @@ if (!buildPath) {
     weapons: Array.isArray(input.weapons) ? input.weapons : [],
     items,
   };
+
   const baseStats = computeStats(build, ctx).final;
   const effects = analyzeBuildEffects(build, baseStats, ctx);
   const goal = GOALS.find((entry) => entry.id === input.goalId) ?? GOALS.find((entry) => entry.id === 'total_dps') ?? GOALS[0];

@@ -21,11 +21,11 @@ async function fetchJson(url) {
 /** Load both source JSON files and add effect-modeled items to the optimizer's item registry. */
 export async function loadEffectData(ctx) {
   const [base, dlc, characterSource] = await Promise.all([
-    fetchJson(new URL('../../../db_json/brotato_items.json', import.meta.url)),
-    fetchJson(new URL('../../../db_json/brotato_items_dlc.json', import.meta.url)),
-    fetchJson(new URL('../../../db_json/brotato_characters.json', import.meta.url)),
+    fetchJson(new URL('../../db_json/brotato_items.json', import.meta.url)),
+    fetchJson(new URL('../../db_json/brotato_items_dlc.json', import.meta.url)),
+    fetchJson(new URL('../../db_json/brotato_characters.json', import.meta.url)),
   ]);
-  const weaponSource = await fetchJson(new URL('../../../db_json/brotato_weapons.json', import.meta.url));
+  const weaponSource = await fetchJson(new URL('../../db_json/brotato_weapons.json', import.meta.url));
   const statIds = new Set(ctx.stats.map((stat) => stat.id));
   const toModifiers = (sourceStats) => Object.fromEntries(
     Object.entries(sourceStats ?? [])

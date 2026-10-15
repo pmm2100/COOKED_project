@@ -14,10 +14,16 @@ export function analyzeBuildEffects(build, baseStats, ctx) {
 
   for (const [itemId, count] of Object.entries(build.items ?? {})) {
     const item = ctx.items.get(itemId);
-    if (!item) continue;
+
+    if (!item)
+      continue;
+
     const model = getEffectModel(item.name);
+
     if (!model) {
-      if (item.effects) unmodeled.push({ item: item.name, effect: item.effects, reason: 'No numeric model yet' });
+      if (item.effects)
+        unmodeled.push({ item: item.name, effect: item.effects, reason: 'No numeric model yet' });
+
       continue;
     }
     modeled.push({ item, model, count });
@@ -25,8 +31,10 @@ export function analyzeBuildEffects(build, baseStats, ctx) {
 
   const calculate = (stats) => {
     const modifiers = {}, effectCaps = {}, entries = [];
+
     for (const { item, model, count } of modeled) {
       let value = 0;
+
       if (model.kind === 'perStat') {
         value = roundBy((stats[model.sourceStat] ?? 0) / model.divisor, model.rounding) * model.amount * count;
       } else if (model.kind === 'perWeapon') {
@@ -64,9 +72,15 @@ export function analyzeBuildEffects(build, baseStats, ctx) {
     for (const [statId, value] of Object.entries(modifiers)) final[statId] = (final[statId] ?? 0) + value;
     for (const stat of ctx.stats) {
       const cap = character?.caps?.[stat.id] ?? stat.max;
-      if (cap != null) final[stat.id] = Math.min(final[stat.id], cap);
-      if (effectCaps[stat.id] != null) final[stat.id] = Math.min(final[stat.id], effectCaps[stat.id]);
-      if (stat.min != null) final[stat.id] = Math.max(final[stat.id], stat.min);
+
+      if (cap != null)
+        final[stat.id] = Math.min(final[stat.id], cap);
+
+      if (effectCaps[stat.id] != null)
+        final[stat.id] = Math.min(final[stat.id], effectCaps[stat.id]);
+
+      if (stat.min != null)
+        final[stat.id] = Math.max(final[stat.id], stat.min);
     }
     return final;
   };
@@ -74,6 +88,7 @@ export function analyzeBuildEffects(build, baseStats, ctx) {
     .some((key) => Math.abs((left[key] ?? 0) - (right[key] ?? 0)) > 1e-9);
 
   let final = { ...baseStats };
+
   for (let i = 0; i < 8; i++) {
     const next = apply(calculate(final));
     if (!changed(final, next)) { final = next; break; }
