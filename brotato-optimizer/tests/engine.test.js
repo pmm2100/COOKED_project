@@ -2,6 +2,7 @@ import { loadData } from '../js/data/index.js';
 import { computeStats, weaponDps } from '../js/engine/stats.js';
 import { analyzeBuildEffects } from '../effect_understanding/evaluate.js';
 import { search } from '../js/optimizer/search.js';
+import { canAddItem } from '../js/engine/validate.js';
 import { renderBuild, renderResults } from '../js/ui/results.js';
 import GOALS from '../js/objectives/goals.js';
 import { loadEffectData } from '../js/data/effects.js';
@@ -16,6 +17,12 @@ const adrenaline = analyzeBuildEffects({ characterId: 'well_rounded', weapons: [
 eq('Adrenaline expected healing estimate', adrenaline.final.hp_regen, 0.3125, 0.0001);
 const ghostOutfit = analyzeBuildEffects({ characterId: 'well_rounded', weapons: [], items: { ghost_outfit: 1 } }, { ...final, dodge: 80 }, d);
 eq('Ghost Outfit effect caps Dodge at 70', ghostOutfit.final.dodge, 70);
+const copyConfig = { maxCopies: 99, maxItems: 100, maxPrice: Infinity };
+for (const [rarity, limit] of [[1, 8], [2, 5], [3, 3], [4, 1]]) {
+	const item = { id: `tier_${rarity}`, rarity, price: 1 };
+	eq(`Tier ${rarity} allows ${limit} copies`, canAddItem({ nItems: limit - 1, items: { [item.id]: limit - 1 }, price: 0 }, item, copyConfig), true);
+	eq(`Tier ${rarity} blocks copy ${limit + 1}`, canAddItem({ nItems: limit, items: { [item.id]: limit }, price: 0 }, item, copyConfig), false);
+}
 const effectItems = new Map(d.items);
 effectItems.set('snowball', { id: 'snowball', name: 'Snowball', statModifiers: {}, effects: '' });
 effectItems.set('strange_book', { id: 'strange_book', name: 'Strange Book', statModifiers: {}, effects: '' });
