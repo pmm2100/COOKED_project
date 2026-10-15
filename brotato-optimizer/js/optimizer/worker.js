@@ -1,12 +1,23 @@
 import { loadData } from '../data/index.js';
+import { loadEffectData } from '../data/effects.js';
 import GOALS from '../objectives/goals.js';
 import { search } from './search.js';
 import { runModeB } from './modeB.js';
 
 const ctx = loadData();
+let effectDataWarning = '';
+try {
+  await loadEffectData(ctx);
+} catch (error) {
+  effectDataWarning = `Effect analysis data unavailable in worker: ${error.message}`;
+}
 const goals = new Map(GOALS.map((goal) => [goal.id, goal]));
 
 self.addEventListener('message', async ({ data }) => {
+  if (effectDataWarning) {
+    self.postMessage({ type: 'warning', message: effectDataWarning });
+    effectDataWarning = '';
+  }
   const goal = goals.get(data.goalId);
   if (!goal) {
     self.postMessage({ type: 'error', message: `Unknown goal: ${data.goalId}` });

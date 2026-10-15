@@ -2,9 +2,10 @@ import { loadData } from '../js/data/index.js';
 import { computeStats, weaponDps } from '../js/engine/stats.js';
 import { analyzeBuildEffects } from '../effect_understanding/evaluate.js';
 import { search } from '../js/optimizer/search.js';
-import { renderBuild } from '../js/ui/results.js';
+import { renderBuild, renderResults } from '../js/ui/results.js';
 import GOALS from '../js/objectives/goals.js';
-const d = loadData(), out = [];
+import { loadEffectData } from '../js/data/effects.js';
+const d = await loadEffectData(loadData()), out = [];
 const eq = (name, got, want, tol = 0) => out.push(`${Math.abs(got - want) <= tol ? 'PASS' : 'FAIL'} ${name}: got ${got}, expected ${want}`);
 const { final } = computeStats({ characterId: 'well_rounded', weapons: [], items: { alien_worm: 2 } }, d);
 eq('Max HP = 5 + 2x3', final.max_hp, 11); eq('HP regen = 2x2', final.hp_regen, 4); eq('Speed', final.speed, 5);
@@ -22,6 +23,9 @@ effectItems.set('elemental_item', { id: 'elemental_item', name: 'Elemental Item'
 const chainedEffects = analyzeBuildEffects({ characterId: 'well_rounded', weapons: [], items: { snowball: 1, strange_book: 1, elemental_item: 1 } },
 	{ ...final, elemental: 0, engineering: 0 }, { ...d, items: effectItems });
 eq('Chained effects use recalculated stats', chainedEffects.final.engineering, 1);
+eq('Base JSON effect item is available to optimizer', d.items.has('bloody_hand'), true);
+eq('DLC JSON effect item is available to optimizer', d.items.has('pearl'), true);
+eq('Effect descriptions are populated from source JSON', d.items.get('adrenaline')?.effects.includes('5 HP'), true);
 const tinyCtx = {
 	stats: d.stats,
 	chars: new Map([['well_rounded', d.chars.get('well_rounded')]]),
@@ -40,6 +44,15 @@ if (typeof document !== 'undefined') {
 	const card = renderBuild({ build: { characterId: 'well_rounded', weapons: [], items: {} }, score: 5, ok: true }, d, GOALS[0]);
 	eq('Build result uses styled card class', card.classList.contains('build-card'), true);
 	eq('Goal statistic uses styled highlight class', Boolean(card.querySelector('tr.is-goal')), true);
+	const rankRoot = document.createElement('div');
+	renderResults(rankRoot, [{ build: { characterId: 'well_rounded', weapons: [], items: {} }, score: 5, ok: true,
+		character: d.chars.get('well_rounded') }], d, GOALS[0], 'B');
+	const rankButton = rankRoot.querySelector('.rank-toggle');
+	const rankDetail = rankRoot.querySelector('.rank-detail');
+	eq('Mode B uses styled rank row', Boolean(rankRoot.querySelector('.rank-row')), true);
+	rankButton.click();
+	eq('Mode B rank expands on click', rankButton.getAttribute('aria-expanded') === 'true', true);
+	eq('Mode B detail becomes visible', rankDetail.hidden, false);
 }
 if (typeof document !== 'undefined') document.getElementById('out').textContent = out.join('\n') + (d.warnings.length ? '\nWARN ' + d.warnings : '');
 else console.log(out.join('\n'));

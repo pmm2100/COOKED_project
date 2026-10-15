@@ -4,9 +4,16 @@ import OPTIONS, { buildConfig } from './objectives/options.js';
 import { buildOptions, sanitize } from './ui/form.js';
 import { renderResults } from './ui/results.js';
 import { el } from './ui/components.js';
+import { loadEffectData } from './data/effects.js';
 
 const KEY = 'bbo:v1', $ = (id) => document.getElementById(id);
-const data = loadData(), goals = new Map(GOALS.map((g) => [g.id, g]));
+const data = loadData();
+try {
+  await loadEffectData(data);
+} catch (error) {
+  data.warnings.push(`Effect analysis data unavailable: ${error.message}`);
+}
+const goals = new Map(GOALS.map((g) => [g.id, g]));
 let activeWorker = null, cancelActiveSearch = null;
 
 function load() {
@@ -60,7 +67,15 @@ function runOptimization(mode, goalId, characterId, config, onProgress) {
     cancelActiveSearch = () => finish(resolve, { cancelled: true });
     worker.addEventListener('message', ({ data: message }) => {
       if (activeWorker !== worker) return;
-      if (message.type === 'progress') onProgress(message.progress);
+      if (message.type === 'warning') {
+        const banner = $('data-banner');
+        const warnings = banner.hidden ? [] : banner.textContent.split('; ');
+        if (!warnings.includes(message.message)) {
+          warnings.push(message.message);
+          banner.textContent = warnings.join('; ');
+        }
+        banner.hidden = false;
+      } else if (message.type === 'progress') onProgress(message.progress);
       else if (message.type === 'done') finish(resolve, { rows: message.rows });
       else if (message.type === 'error') finish(reject, new Error(message.message));
     });
@@ -86,6 +101,26 @@ $('goal-select').onchange = (e) => {
   }
 };
 $('opt-dlc').onchange = (e) => { state.values.dlc = e.target.checked; save(); };
+document.querySelector('[data-preset="safe"]').addEventListener('click', () => {
+  state.goal = 'balanced_tank';
+  state.values = sanitize({ ...state.values, minArmor: 5, minHp: 30, minDodge: 15 }, OPTIONS, data);
+  save(); sync();
+});
+document.querySelector('[data-preset="aggressive"]').addEventListener('click', () => {
+  state.goal = 'total_dps';
+  state.values = sanitize({ ...state.values, minArmor: 0, minHp: 0, minDodge: 0, minSpeed: 0 }, OPTIONS, data);
+  save(); sync();
+});
+document.querySelector('[data-preset="economy"]').addEventListener('click', () => {
+  state.goal = 'stat_harvesting';
+  state.values = sanitize({ ...state.values, maxPrice: 100 }, OPTIONS, data);
+  save(); sync();
+});
+document.querySelector('[data-preset="speedrun"]').addEventListener('click', () => {
+  state.goal = 'total_dps';
+  state.values = sanitize({ ...state.values, maxPrice: 0, maxItems: 15, tier: 4, maxWeapons: 6 }, OPTIONS, data);
+  save(); sync();
+});
 $('character-select').onchange = (e) => updateCharacter(e.target.value);
 $('character-search').onchange = (e) => {
   const c = [...data.chars.values()].find((x) => x.name.toLowerCase() === e.target.value.trim().toLowerCase());

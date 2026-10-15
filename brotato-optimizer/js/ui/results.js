@@ -29,17 +29,33 @@ export function renderBuild(r, ctx, goal) {
     el('p', {}, el('strong', {}, 'Weapons: '), p.weapons.join(', ') || 'none'),
     el('p', {}, el('strong', {}, 'Items: '), p.items.join(', ') || 'none'),
     el('table', {}, el('tbody', {}, rows)),
-    effects.entries.length ? el('details', { open: true }, el('summary', {}, 'Numeric effects included in score'), el('ul', {}, effects.entries.map((x) =>
-      el('li', {}, `${x.item}: ${x.stat} ${x.value > 0 ? '+' : ''}${fmt(x.value)}${x.estimate ? ' (estimate)' : ''} (${x.effect})${x.assumption ? ` — ${x.assumption}` : ''}`)))) : null,
+    effects.entries.length ? el('details', { open: true }, el('summary', {}, 'Effect analysis (included in score)'), el('ul', {}, effects.entries.map((x) =>
+      el('li', {}, `${x.item}: ${x.stat} ${x.value > 0 ? '+' : ''}${fmt(x.value)}${x.estimate ? ' (estimate)' : ''}${x.applied ? '' : ' (no stat change for this build)'} — ${x.effect}${x.assumption ? `; ${x.assumption}` : ''}`)))) : null,
     notes.length ? el('details', {}, el('summary', {}, 'Effects not included in calculation'), el('ul', {}, notes.map((n) => el('li', {}, n)))) : null,
-    el('details', {}, el('summary', {}, 'Where the numbers come from'), el('ul', {}, Object.entries(breakdown).map(([id, src]) =>
-      el('li', {}, `${ctx.stats.find((s) => s.id === id).name}: ${src.map((x) => `${x.source} ${x.value > 0 ? '+' : ''}${fmt(x.value)}`).join(', ')}`)))),
+    el('details', {}, el('summary', {}, 'Where the numbers come from'), el('ul', {}, [
+      ...Object.entries(breakdown).map(([id, src]) =>
+        el('li', {}, `${ctx.stats.find((s) => s.id === id)?.name ?? id}: ${src.map((x) => `${x.source} ${x.value > 0 ? '+' : ''}${fmt(x.value)}`).join(', ')}`)),
+      ...effects.entries.filter((x) => x.value !== 0).map((x) =>
+        el('li', {}, `${ctx.stats.find((s) => s.id === x.stat)?.name ?? x.stat}: ${x.item} effect ${x.value > 0 ? '+' : ''}${fmt(x.value)}`)),
+    ])),
     el('button', { type: 'button', onclick: copy }, 'Copy build as text'));
 }
 
 export function renderResults(root, rows, ctx, goal, mode) {
   if (!rows.length) return renderMessage(root, 'No build matches your constraints. Relax the options and try again.');
   if (mode === 'A') return root.replaceChildren(...rows.map((r) => renderBuild(r, ctx, goal)));
-  root.replaceChildren(...rows.map((r, i) => el('details', { class: 'rank', open: i === 0 },
-    el('summary', {}, `${i + 1}. ${r.character.name}, ${goal.label}: ${fmt(r.score)}`), renderBuild(r, ctx, goal))));
+  root.replaceChildren(...rows.map((r, i) => {
+    const detail = el('div', { class: 'rank-detail', hidden: i !== 0 }, renderBuild(r, ctx, goal));
+    const toggle = el('button', { type: 'button', class: 'rank-toggle', 'aria-expanded': i === 0,
+      onclick: (event) => {
+        const expanded = event.currentTarget.getAttribute('aria-expanded') === 'true';
+        event.currentTarget.setAttribute('aria-expanded', String(!expanded));
+        detail.hidden = expanded;
+      } },
+    el('span', { class: 'rank-pos' }, `${i + 1}.`),
+    el('span', { class: 'rank-name' }, r.character.name),
+    el('span', { class: 'rank-mini' }, goal.label),
+    el('span', { class: 'rank-score' }, fmt(r.score)));
+    return el('article', { class: 'rank-row' }, toggle, detail);
+  }));
 }

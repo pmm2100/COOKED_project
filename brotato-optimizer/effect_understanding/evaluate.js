@@ -48,8 +48,9 @@ export function analyzeBuildEffects(build, baseStats, ctx) {
 
       if (!Number.isFinite(value)) continue;
       if (model.kind !== 'statCap' && value !== 0) modifiers[model.stat] = (modifiers[model.stat] ?? 0) + value;
-      if (value !== 0 || model.kind === 'statCap') entries.push({
+      entries.push({
         item: item.name, effect: model.effect, stat: model.stat, value,
+        applied: value !== 0 || model.kind === 'statCap',
         ...(model.estimate ? { estimate: true } : {}),
         ...(model.assumption ? { assumption: model.assumption } : {}),
       });
