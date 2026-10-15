@@ -1,0 +1,356 @@
+{
+  "Ashes": {
+    "tier": 4,
+    "price": 100,
+    "limit": null,
+    "unlocked_by": null,
+    "stats": {
+      "damage": 20,
+      "attack_speed": 20,
+      "range": 100
+    },
+    "effect": "-1 Armor at the end of a wave."
+  },
+  "Axolotl": {
+    "tier": 4,
+    "price": 130,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {},
+    "effect": "Your highest (Max HP) and lowest (Max HP) positive primary stats are swapped when you get this item."
+  },
+  "Baby Squid": {
+    "tier": 2,
+    "price": 55,
+    "limit": null,
+    "unlocked_by": null,
+    "stats": {
+      "attack_speed": -3
+    },
+    "effect": "+1 HP Regeneration when you level up."
+  },
+  "Barnacle": {
+    "tier": 3,
+    "price": 80,
+    "limit": 1,
+    "unlocked_by": "Win a run with Creature",
+    "stats": {},
+    "effect": "+35% stats gained from level upgrades. +1 Curse when you level up."
+  },
+  "Black Flag": {
+    "tier": 3,
+    "price": 60,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {
+      "enemies": 10,
+      "enemy_health": 10,
+      "enemy_damage": 10,
+      "curse": 5
+    },
+    "effect": "+1 material when you kill a cursed enemy."
+  },
+  "Bone Dice": {
+    "tier": 2,
+    "price": 30,
+    "limit": 2,
+    "unlocked_by": null,
+    "stats": {},
+    "effect": "+50% chance to get +1% Damage when rerolling in the shop. +10% chance to get -1 Max HP when rerolling in the shop."
+  },
+  "Builder's Turret": {
+    "tier": 1,
+    "price": 1,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {},
+    "effect": "This turret's stats are derived from your best ranged weapon's base stats and scale with Engineering. +1 projectile when you reach 30 Structure Range."
+  },
+  "Builder's Turret II": {
+    "tier": 2,
+    "price": 1,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {},
+    "effect": "This turret's stats are derived from your best ranged weapon's base stats and scale with Engineering. +1 projectile. +1 projectile when you reach 150 Structure Range."
+  },
+  "Builder's Turret III": {
+    "tier": 3,
+    "price": 1,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {},
+    "effect": "This turret's stats are derived from your best ranged weapon's base stats and scale with Engineering. +2 projectiles. +1 projectile when you reach 300 Structure Range."
+  },
+  "Builder's Turret IV": {
+    "tier": 4,
+    "price": 1,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {},
+    "effect": "This turret's stats are derived from your best ranged weapon's base stats and scale with Engineering. +3 projectiles."
+  },
+  "Cauldron": {
+    "tier": 2,
+    "price": 35,
+    "limit": 1,
+    "unlocked_by": "Win a run with Druid",
+    "stats": {
+      "pickup_range": 50,
+      "hp_regeneration": -2
+    },
+    "effect": "+20% Damage for 2 seconds after picking up a consumable."
+  },
+  "Coral": {
+    "tier": 2,
+    "price": 40,
+    "limit": null,
+    "unlocked_by": null,
+    "stats": {
+      "range": -10
+    },
+    "effect": "+10 HP Regeneration while standing still."
+  },
+  "Corrupted Shard": {
+    "tier": 1,
+    "price": 12,
+    "limit": null,
+    "unlocked_by": null,
+    "stats": {
+      "damage": 3,
+      "curse": 1
+    },
+    "effect": null
+  },
+  "Crystal": {
+    "tier": 3,
+    "price": 65,
+    "limit": null,
+    "unlocked_by": null,
+    "stats": {
+      "attack_speed": 5,
+      "engineering": -2
+    },
+    "effect": "+1% Attack Speed every 1 second until the end of the wave. Bonus is lost when taking damage."
+  },
+  "Eyepatch": {
+    "tier": 2,
+    "price": 55,
+    "limit": null,
+    "unlocked_by": "Win a run with Buccaneer",
+    "stats": {
+      "crit_chance": 3
+    },
+    "effect": "Projectiles get +1 piercing on critical hit. -10% Accuracy."
+  },
+  "Feather": {
+    "tier": 1,
+    "price": 18,
+    "limit": null,
+    "unlocked_by": null,
+    "stats": {
+      "ranged_damage": 1,
+      "dodge": 3,
+      "xp_gain": -3
+    },
+    "effect": null
+  },
+  "Fish Hook": {
+    "tier": 2,
+    "price": 35,
+    "limit": 3,
+    "unlocked_by": null,
+    "stats": {
+      "curse": 1
+    },
+    "effect": "Locked items and weapons have a 20% chance to become cursed when leaving the shop."
+  },
+  "Goblet": {
+    "tier": 3,
+    "price": 70,
+    "limit": 3,
+    "unlocked_by": null,
+    "stats": {
+      "hp_regeneration": -3
+    },
+    "effect": "+15% chance to heal 1 HP when killing an enemy."
+  },
+  "Goldfish": {
+    "tier": 3,
+    "price": 23,
+    "limit": null,
+    "unlocked_by": null,
+    "stats": {},
+    "effect": "Items will be 1 tier higher after the next reroll."
+  },
+  "Jerky": {
+    "tier": 2,
+    "price": 50,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {
+      "hp_recovered_from_consumables": 3
+    },
+    "effect": "Consumables heal you over 4 seconds instead of instantly."
+  },
+  "Knot": {
+    "tier": 3,
+    "price": 80,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {
+      "damage": 15,
+      "max_hp": 15
+    },
+    "effect": "Weapons can no longer be upgraded or recycled."
+  },
+  "Kraken's Eye": {
+    "tier": 4,
+    "price": 110,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {
+      "max_hp": 15,
+      "curse": 15
+    },
+    "effect": "You have a 50% chance to explode for 10 (+500% Curse) damage when you get hit."
+  },
+  "Lantern": {
+    "tier": 4,
+    "price": 100,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {
+      "damage": 10,
+      "range": 50,
+      "knockback": 15
+    },
+    "effect": "Knocks nearby enemies back every 3 seconds. In Nightmare difficulty, fog visibility increases by 75%."
+  },
+  "Lighthouse": {
+    "tier": 3,
+    "price": 80,
+    "limit": 1,
+    "unlocked_by": "Win a run with Builder",
+    "stats": {
+      "engineering": 20
+    },
+    "effect": "-1 Engineering for every 1 Structure you have. In Nightmare difficulty, fog visibility increases by 100%."
+  },
+  "Mirror": {
+    "tier": 3,
+    "price": 60,
+    "limit": null,
+    "unlocked_by": null,
+    "stats": {},
+    "effect": "Duplicates the next item you get from the shop (item limits can't be exceeded)."
+  },
+  "Pearl": {
+    "tier": 2,
+    "price": 60,
+    "limit": 20,
+    "unlocked_by": "Win a run with Curious",
+    "stats": {},
+    "effect": "+1% Damage for every permanent 10 Luck you have. +3% chance of finding an extra Pearl in a crate."
+  },
+  "Penguin": {
+    "tier": 1,
+    "price": 25,
+    "limit": 3,
+    "unlocked_by": null,
+    "stats": {
+      "hp_regeneration": 1
+    },
+    "effect": "+1 HP Regeneration until the end of the wave when picking up a consumable while at maximum health."
+  },
+  "Saltwater": {
+    "tier": 2,
+    "price": 50,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {
+      "melee_damage": 2,
+      "attack_speed": 3,
+      "elemental_damage": -1
+    },
+    "effect": "+10% Speed for 3 seconds when you take damage."
+  },
+  "Scarf": {
+    "tier": 3,
+    "price": 80,
+    "limit": null,
+    "unlocked_by": "Win a run with Hiker",
+    "stats": {
+      "hp_regeneration": 4,
+      "melee_damage": 4,
+      "speed": 4
+    },
+    "effect": "+25% Enemy Speed during the next wave."
+  },
+  "Seashell": {
+    "tier": 4,
+    "price": 100,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {
+      "damage": -10
+    },
+    "effect": "Every ranged weapon's 5th projectile has +3 projectiles."
+  },
+  "Small Fish": {
+    "tier": 1,
+    "price": 18,
+    "limit": null,
+    "unlocked_by": null,
+    "stats": {
+      "attack_speed": -3
+    },
+    "effect": "+10% damage against targets above 75% health."
+  },
+  "Spyglass": {
+    "tier": 2,
+    "price": 30,
+    "limit": 2,
+    "unlocked_by": null,
+    "stats": {
+      "range": 10,
+      "reroll_price": -25
+    },
+    "effect": null
+  },
+  "Starfish": {
+    "tier": 3,
+    "price": 75,
+    "limit": 3,
+    "unlocked_by": "Win a run with Diver",
+    "stats": {
+      "harvesting": 10,
+      "enemy_damage": 15
+    },
+    "effect": "+20% materials dropped from enemies."
+  },
+  "Sunken Bell": {
+    "tier": 3,
+    "price": 65,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {},
+    "effect": "Once per wave, you explode for 100 (+500% Melee Damage +500% Ranged Damage +500% Elemental Damage +500% Engineering) damage when you fall below 40% health."
+  },
+  "Treasure Map": {
+    "tier": 2,
+    "price": 35,
+    "limit": 5,
+    "unlocked_by": "Win a run with Sailor",
+    "stats": {},
+    "effect": "+20% chance of finding an extra item in a crate."
+  },
+  "Whistle": {
+    "tier": 1,
+    "price": 25,
+    "limit": 1,
+    "unlocked_by": null,
+    "stats": {},
+    "effect": "+50% chance for loot aliens to appear. +20% movement speed for loot aliens. Whistles when a loot alien spawns."
+  }
+}
