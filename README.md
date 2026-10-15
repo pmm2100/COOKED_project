@@ -9,6 +9,18 @@ python -m http.server 8000     # albo: npx serve
 ```
 i otwórz http://localhost:8000. Testy: http://localhost:8000/tests/engine.test.html (albo `node tests/engine.test.js`).
 
+Walidacja przed wdrożeniem:
+```
+cd brotato-optimizer
+npm test
+npm run build
+```
+`npm run build` sprawdza składnię wszystkich modułów oraz spójność rejestrów danych, celów i opcji.
+
+Jeśli konsola pokazuje błąd w adresie `chrome-extension://.../content.js`, pochodzi on z rozszerzenia
+Chrome, a nie z tej aplikacji. Należy wyłączyć rozszerzenie lub powtórzyć test w oknie incognito bez
+tego rozszerzenia. Błędy aplikacji będą wskazywać adres `http://.../brotato-optimizer/...`.
+
 ## Architektura
 - `js/data/*.js` – dane (moduły ES) + `index.js` (walidacja, błędny rekord jest pomijany i pokazany w banerze)
 - `js/engine/` – czyste funkcje: `computeStats` (z rozbiciem źródeł), `weaponDps`, wzory, reguły buildu

@@ -1,1 +1,7 @@
-{"type":"module"}
+{
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/validate-build.mjs",
+    "test": "node tests/engine.test.js"
+  }
+}

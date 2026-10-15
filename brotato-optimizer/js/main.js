@@ -56,7 +56,11 @@ function runOptimization(mode, goalId, characterId, config, onProgress) {
   return new Promise((resolve, reject) => {
     const worker = new Worker(new URL('./optimizer/worker.js', import.meta.url), { type: 'module' });
     activeWorker = worker;
+    const timeout = setTimeout(() => finish(reject, new Error(
+      'Optimizer did not respond in time. Check that the app is served over HTTP and reload the page.'
+    )), 30000);
     const finish = (handler, value) => {
+      clearTimeout(timeout);
       worker.terminate();
       if (activeWorker === worker) {
         activeWorker = null;
@@ -83,6 +87,7 @@ function runOptimization(mode, goalId, characterId, config, onProgress) {
       event.preventDefault();
       finish(reject, new Error(event.message || 'Optimizer worker failed.'));
     });
+    onProgress(0);
     worker.postMessage({ mode, goalId, characterId, config });
   });
 }

@@ -9,6 +9,10 @@ const statAliases = {
 };
 
 async function fetchJson(url) {
+  if (url.protocol === 'file:' && typeof process !== 'undefined' && process.versions?.node) {
+    const { readFile } = await import('node:fs/promises');
+    return JSON.parse(await readFile(url, 'utf8'));
+  }
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Could not load effect data (${response.status}): ${url}`);
   return response.json();
