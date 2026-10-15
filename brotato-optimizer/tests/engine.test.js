@@ -109,6 +109,12 @@ eq('Search preserves six-weapon paths with item search enabled', fullWeaponSearc
 same('Characters that cannot equip weapons return no required-weapon build', search('bull', { score: (stats) => stats.max_hp }, {
 	...tinyConfig, rarities: [], maxItems: 0, maxWeapons: 6, results: 1, requireWeapon: true,
 }, d).length, 0);
+const uiConfigSearch = search('well_rounded', { score: (stats) => stats.max_hp }, {
+	dlc: true, rarities: ['1', '2', '3', '4'], banned: [], noDownsides: false, maxCopies: 99,
+	maxItems: 30, minItems: 0, maxWeapons: 6, preferredTier: 4, allowDup: false,
+	requireWeapon: true, maxPrice: Infinity, minStats: {}, beam: 12, results: 1,
+}, d);
+eq('Default UI configuration returns six weapons', uiConfigSearch[0]?.build.weapons.length, 6);
 const harvestingCtx = {
 	...tinyCtx,
 	items: new Map([['harvesting_item', { id: 'harvesting_item', name: 'Harvesting Item', rarity: 1, price: 10, statModifiers: { harvesting: 25 }, effects: '' }]]),

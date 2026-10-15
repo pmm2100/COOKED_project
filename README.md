@@ -36,7 +36,8 @@ obrażeniami, cooldownami i przelicznikami statystyk.
 tiery, obrażenia, cooldown, ceny, klasy i podstawowe skalowanie. Loader dodaje je do rejestru
 wyszukiwarki przy starcie aplikacji. Wyszukiwanie uwzględnia bonusy klas broni od 2 do 6
 wyposażonych broni, preferuje wypełnienie ustawionego limitu `Max weapons` i filtruje bronie
-według celu statystycznego, np. Life Steal.
+według celu statystycznego, np. Life Steal. Pełne wyszukiwanie trybu A ma limit 60 sekund;
+przy `Max weapons = 6` algorytm chroni ścieżki prowadzące do wszystkich sześciu slotów.
 
 ## Znane uproszczenia (TODO)
 - specjalne efekty pojedynczych broni (np. pociski, eksplozje i resetowanie cooldownu) są zachowane w opisie, ale nie wszystkie są modelowane liczbowo
