@@ -1,9 +1,9 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadData } from '../brotato-optimizer/js/data/index.js';
-import { computeStats } from '../brotato-optimizer/js/engine/stats.js';
-import GOALS from '../brotato-optimizer/js/objectives/goals.js';
+import { loadData } from '../js/data/index.js';
+import { computeStats } from '../js/engine/stats.js';
+import GOALS from '../js/objectives/goals.js';
 import { analyzeBuildEffects, getEffectModel } from './evaluate.js';
 import { EFFECT_ASSUMPTIONS } from './data/effect-values.js';
 

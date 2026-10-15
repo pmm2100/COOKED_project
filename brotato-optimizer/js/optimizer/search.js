@@ -1,6 +1,6 @@
 import { computeStats } from '../engine/stats.js';
 import { canAddItem, canAddWeapon } from '../engine/validate.js';
-import { analyzeBuildEffects } from '../../../effect_understanding/evaluate.js';
+import { analyzeBuildEffects } from '../../effect_understanding/evaluate.js';
 
 /**
  * Beam search over "add one weapon / add one item" steps; stops when no step improves the best score.

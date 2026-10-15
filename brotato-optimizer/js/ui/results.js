@@ -1,6 +1,6 @@
 import { el } from './components.js';
 import { computeStats, totalDps } from '../engine/stats.js';
-import { analyzeBuildEffects } from '../../../effect_understanding/evaluate.js';
+import { analyzeBuildEffects } from '../../effect_understanding/evaluate.js';
 const ROMAN = ['I', 'II', 'III', 'IV'], fmt = (n) => String(Math.round(n * 10) / 10);
 
 const parts = (b, ctx) => ({
