@@ -25,6 +25,7 @@ export async function loadEffectData(ctx) {
     fetchJson(new URL('../../../db_json/brotato_items_dlc.json', import.meta.url)),
     fetchJson(new URL('../../../db_json/brotato_characters.json', import.meta.url)),
   ]);
+  const weaponSource = await fetchJson(new URL('../../../db_json/brotato_weapons.json', import.meta.url));
   const statIds = new Set(ctx.stats.map((stat) => stat.id));
   const toModifiers = (sourceStats) => Object.fromEntries(
     Object.entries(sourceStats ?? [])
@@ -96,6 +97,22 @@ export async function loadEffectData(ctx) {
     character.unlocks = record.unlocks ?? character.unlocks;
     character.note = record.effect ?? character.note;
     if (!existing) ctx.chars.set(character.id, character);
+  }
+
+  for (const [id, record] of Object.entries(weaponSource)) {
+    if (!record?.tiers?.length) continue;
+    const existing = ctx.weapons.get(id);
+    if (existing) continue;
+    ctx.weapons.set(id, {
+      id,
+      name: record.name,
+      dlc: record.dlc ?? false,
+      type: record.type ?? 'melee',
+      classes: record.classes ?? [],
+      price: record.price ?? [null, null, null, null],
+      tiers: record.tiers,
+      note: record.note ?? '',
+    });
   }
 
   return ctx;

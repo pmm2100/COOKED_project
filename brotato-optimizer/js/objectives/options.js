@@ -11,7 +11,7 @@ const OPTIONS = [
   num('minItems', 'Min items', 'Build size', 0, 0, 60, (c, v) => { c.minItems = v; }),
   num('maxItems', 'Max items', 'Build size', 30, 0, 60, (c, v) => { c.maxItems = v; }),
   num('tier', 'Highest weapon tier', 'Weapons', 4, 1, 4, (c, v) => { c.preferredTier = v; }),
-  tog('allowDup', 'Allow duplicate weapons', 'Weapons', true, (c, v) => { c.allowDup = v; }),
+  tog('allowDup', 'Allow duplicate weapons', 'Weapons', false, (c, v) => { c.allowDup = v; }),
   num('maxPrice', 'Total price budget (0 = off)', 'Budget', 0, 0, 9999, (c, v) => { c.maxPrice = v > 0 ? v : Infinity; }),
   num('minArmor', 'Minimum Armor (0 = off)', 'Stat constraints', 0, 0, 100, (c, v) => { if (v > 0) c.minStats.armor = v; }),
   num('minDodge', 'Minimum Dodge (0 = off)', 'Stat constraints', 0, 0, 90, (c, v) => { if (v > 0) c.minStats.dodge = v; }),
@@ -29,7 +29,7 @@ export default OPTIONS;
 
 export function buildConfig(values) {
   const c = { dlc: true, rarities: [], banned: [], noDownsides: false, maxCopies: 99, maxWeapons: 6, minItems: 0, maxItems: 30,
-    preferredTier: 4, allowDup: true, maxPrice: Infinity, minStats: {}, results: 3, beam: 12 };
+    preferredTier: 4, allowDup: false, requireWeapon: true, maxPrice: Infinity, minStats: {}, results: 3, beam: 12 };
   for (const o of OPTIONS) o.apply(c, values[o.id]);
   c.maxItems = Math.max(c.minItems, c.maxItems);
   return c;

@@ -32,6 +32,7 @@ uniqueIds(GOALS, 'Goals');
 uniqueIds(OPTIONS, 'Options');
 if (!data.chars.size || !data.items.size || !data.weapons.size) throw new Error('Required data registry is empty.');
 if (data.items.size < 247 || data.chars.size < 64) throw new Error('JSON data records were not fully loaded.');
+if (data.weapons.size < 78 || !data.weapons.has('blunderbuss')) throw new Error('Wiki weapon records were not fully loaded.');
 if (data.warnings.length) throw new Error(`Data validation warnings: ${data.warnings.join('; ')}`);
 
 console.log(`Build validation passed: ${sourceFiles.length} JavaScript files and ${data.items.size} items checked.`);

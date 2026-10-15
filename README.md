@@ -32,8 +32,14 @@ tego rozszerzenia. Błędy aplikacji będą wskazywać adres `http://.../brotato
 warunki odblokowania, nagrody, wyposażenie startowe, tagi i efekty. Dane dodatkowych broni wymagają osobnego źródła z tierami,
 obrażeniami, cooldownami i przelicznikami statystyk.
 
+`db_json/brotato_weapons.json` zawiera dane broni z tabel Weapons wiki (melee i ranged), w tym
+tiery, obrażenia, cooldown, ceny, klasy i podstawowe skalowanie. Loader dodaje je do rejestru
+wyszukiwarki przy starcie aplikacji. Wyszukiwanie uwzględnia bonusy klas broni od 2 do 6
+wyposażonych broni, preferuje wypełnienie ustawionego limitu `Max weapons` i filtruje bronie
+według celu statystycznego, np. Life Steal.
+
 ## Znane uproszczenia (TODO)
-- dane: tylko wycinek wiki (15 postaci, 11 broni wręcz, 26 przedmiotów); brak broni dystansowych, bonusów setów, wartości bazowych statystyk (`null` + `TODO verify`)
+- specjalne efekty pojedynczych broni (np. pociski, eksplozje i resetowanie cooldownu) są zachowane w opisie, ale nie wszystkie są modelowane liczbowo
 - efekty warunkowe i specjalne są tylko opisane jako tekst („Not included in calculation”)
-- wzór pancerza i formuła szybkości ataku do potwierdzenia na wiki (`engine/stats.js`)
+- wzór pancerza i formuła szybkości ataku do potwierdzenia na wiki (`engine/stats.js`); bazowe Max HP wynosi 10, a wynik jest ograniczony do minimum 1
 - brak: Web Workera, ulepszania lokalnego, share linku, presetów, custom weights, celu dodatkowego, `tools/scrape-wiki.mjs`

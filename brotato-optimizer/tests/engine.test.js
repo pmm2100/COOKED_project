@@ -10,12 +10,23 @@ const d = await loadEffectData(loadData()), out = [];
 const eq = (name, got, want, tol = 0) => out.push(`${Math.abs(got - want) <= tol ? 'PASS' : 'FAIL'} ${name}: got ${got}, expected ${want}`);
 const same = (name, got, want) => out.push(`${got === want ? 'PASS' : 'FAIL'} ${name}: got ${got}, expected ${want}`);
 const { final } = computeStats({ characterId: 'well_rounded', weapons: [], items: { alien_worm: 2 } }, d);
-eq('Max HP = 5 + 2x3', final.max_hp, 11); eq('HP regen = 2x2', final.hp_regen, 4); eq('Speed', final.speed, 5);
-eq('Character Max HP is included without items', computeStats({ characterId: 'well_rounded', weapons: [], items: {} }, d).final.max_hp, 5);
-eq('Character Max HP is included before item stats', final.max_hp - 2 * d.items.get('alien_worm').statModifiers.max_hp, 5);
+eq('Max HP = 10 + 5 + 2x3', final.max_hp, 21); eq('HP regen = 2x2', final.hp_regen, 4); eq('Speed', final.speed, 5);
+eq('Base Max HP is included without items', computeStats({ characterId: 'well_rounded', weapons: [], items: {} }, d).final.max_hp, 15);
+eq('Character Max HP is included before item stats', final.max_hp - 2 * d.items.get('alien_worm').statModifiers.max_hp, 15);
+eq('Max HP cannot become negative', computeStats({ characterId: 'brawler', weapons: [
+	{ id: 'scythe', tier: 4 }, { id: 'scythe', tier: 4 }, { id: 'scythe', tier: 4 },
+	{ id: 'scythe', tier: 4 }, { id: 'scythe', tier: 4 }, { id: 'scythe', tier: 4 },
+], items: { leather_vest: 5, blindfold: 5 } }, d).final.max_hp, 1);
 eq('Fist tier I DPS (wiki: 10.3)', weaponDps(d.weapons.get('fist'), 1, final), 10.3, 0.1);
+const classStats = computeStats({ characterId: 'well_rounded', weapons: [
+	{ id: 'fist', tier: 1 }, { id: 'fist', tier: 1 }, { id: 'fist', tier: 1 },
+], items: {} }, d).final;
+eq('Unarmed class bonus is applied', classStats.dodge, 6);
+eq('Weapon class bonus supports Life Steal builds', computeStats({ characterId: 'well_rounded', weapons: [
+	{ id: 'sword', tier: 1 }, { id: 'sword', tier: 1 },
+], items: {} }, d).final.life_steal, 1);
 const g = computeStats({ characterId: 'chunky', weapons: [], items: { alien_worm: 2 } }, d).final;
-eq('Chunky: Max HP x1.25 on items', g.max_hp, 7.5); eq('Chunky: HP regen x0.5 on items', g.hp_regen, 2);
+eq('Chunky: Max HP x1.25 on items', g.max_hp, 17.5); eq('Chunky: HP regen x0.5 on items', g.hp_regen, 2);
 const adrenaline = analyzeBuildEffects({ characterId: 'well_rounded', weapons: [], items: { adrenaline: 1 } }, { ...final, dodge: 50, hp_regen: 0 }, d);
 eq('Adrenaline expected healing estimate', adrenaline.final.hp_regen, 0.3125, 0.0001);
 const ghostOutfit = analyzeBuildEffects({ characterId: 'well_rounded', weapons: [], items: { ghost_outfit: 1 } }, { ...final, dodge: 80 }, d);
@@ -44,6 +55,8 @@ eq('Character tags are loaded', d.chars.get('generalist')?.itemTags.includes('Me
 eq('Original Brawler ranged penalty is applied', d.chars.get('brawler')?.statModifiers.ranged, -50);
 eq('Original Chunky consumable stat is applied', d.chars.get('chunky')?.statModifiers.hp_recovered_from_consumables, 3);
 eq('Original Ranger range stat is applied', d.chars.get('ranger')?.statModifiers.range, 50);
+eq('Wiki weapon records are available to optimizer', d.weapons.size >= 78, true);
+eq('Wiki ranged weapon is searchable', d.weapons.has('blunderbuss'), true);
 const tinyCtx = {
 	stats: d.stats,
 	chars: new Map([['well_rounded', d.chars.get('well_rounded')]]),
@@ -53,7 +66,7 @@ const tinyCtx = {
 const tinyConfig = {
 	dlc: false, rarities: ['3'], banned: [], noDownsides: false, maxCopies: 1,
 	maxItems: 1, maxWeapons: 0, preferredTier: 4, maxPrice: Infinity,
-	minStats: {}, beam: 10, results: 1, allowDup: false,
+	minStats: {}, beam: 10, results: 1, allowDup: false, requireWeapon: false,
 };
 const effectSearch = search('well_rounded', { score: (stats) => stats.hp_regen }, tinyConfig, tinyCtx);
 eq('Search scoring includes modeled item effects', effectSearch[0]?.score, 0.03125, 0.0001);
@@ -67,6 +80,18 @@ const deepSearch = search('well_rounded', { score: (stats) => stats.max_hp }, {
   ...tinyConfig, rarities: ['3'], maxCopies: 99, minItems: 0, maxItems: 30, maxPrice: 3000,
 }, { ...tinyCtx, items: new Map([['alien_baby', { id: 'alien_baby', name: 'Alien Baby', rarity: 3, price: 80, statModifiers: { max_hp: 15 }, effects: '' }]]) });
 eq('Search explores beyond the first two items', deepSearch[0]?.build.items.alien_baby, 3);
+const weaponTieSearch = search('well_rounded', { score: (stats) => stats.max_hp }, {
+	...tinyConfig, rarities: [], maxItems: 0, maxWeapons: 1, beam: 100, results: 1,
+}, d);
+same('Weapon ties prefer highest DPS instead of first registry weapon', weaponTieSearch[0]?.build.weapons[0]?.id, 'excalibur');
+const tierSearch = search('well_rounded', { score: (stats) => stats.max_hp }, {
+	...tinyConfig, rarities: [], maxItems: 0, maxWeapons: 1, preferredTier: 2, maxPrice: Infinity, allowDup: false, beam: 100, results: 1,
+}, d);
+same('Weapon search keeps tiers at or below selected tier', tierSearch[0]?.build.weapons[0]?.tier <= 2, true);
+const multiWeaponSearch = search('well_rounded', { score: (stats) => stats.life_steal }, {
+	...tinyConfig, rarities: [], maxItems: 0, maxWeapons: 4, beam: 100, results: 1,
+}, d);
+eq('Search fills available weapon slots for a weapon-focused build', multiWeaponSearch[0]?.build.weapons.length, 4);
 if (typeof document !== 'undefined') {
 	const card = renderBuild({ build: { characterId: 'well_rounded', weapons: [], items: {} }, score: 5, ok: true }, d, GOALS[0]);
 	eq('Build result uses styled card class', card.classList.contains('build-card'), true);
