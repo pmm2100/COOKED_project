@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Brotato Build Optimizer</title><link rel="stylesheet" href="css/style.css"></head>
+<body>
+<header><h1>Brotato Build Optimizer</h1><p>Pick a character or a goal and get the strongest weapon and item combinations found by beam search.</p></header>
+<div id="banner" role="alert" hidden></div>
+<main>
+<form id="form" aria-label="Build settings">
+<div class="modes" role="group" aria-label="Mode"><button type="button" id="modeA">I have a character</button><button type="button" id="modeB">I have a goal</button></div>
+<label id="charRow">Character<input id="char" list="chars" autocomplete="off"><datalist id="chars"></datalist></label>
+<label>Goal<select id="goal"></select></label>
+<div id="options"></div>
+<div class="actions"><button type="submit" id="go">Generate</button><button type="button" id="cancel" hidden>Cancel</button><button type="button" id="reset">Reset</button></div>
+<progress id="bar" max="1" value="0" hidden></progress>
+</form>
+<section id="results" aria-live="polite"><p>Choose a goal and press Generate.</p></section>
+</main>
+<script type="module" src="js/main.js"></script>
+</body></html>
